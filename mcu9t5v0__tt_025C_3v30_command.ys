@@ -1,0 +1,43 @@
+read_verilog uartTopBaseExt.v
+read_verilog uart_tx.v
+read_verilog uart_rx.v
+read_verilog uart_baud_gen.v
+read_verilog -sv command_parser.sv
+read_verilog -sv integration_minus_UART.sv
+read_verilog -sv reg_bank.sv
+read_verilog -sv MAC_grid.sv
+read_verilog -sv quantizer.sv
+read_verilog -sv int_MAC.sv
+read_verilog -sv integration_final.sv
+
+hierarchy -top integration_final
+
+read_liberty -lib /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+
+proc
+opt
+check
+stat
+
+synth -top integration_final -noabc
+stat
+
+dfflibmap -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+
+stat -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+
+abc -fast -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+
+opt
+clean
+check
+stat
+
+tee -o res_tt_025C_3v30/synthesis_report.txt stat -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_3v30.lib
+
+tee -o res_tt_025C_3v30/design_check.txt check
+
+tee -o res_tt_025C_3v30/hierarchy.txt hierarchy
+
+write_verilog -noattr res_tt_025C_3v30/integration_final_synth.v
+write_json res_tt_025C_3v30/integration_final.json
